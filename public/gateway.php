@@ -7,6 +7,11 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 $data = implode(' ', array_slice($argv, 1));
 
+if ($data === '') {
+    echo "['status' => 400, 'message' => 'Image is required']\n";
+    return;
+}
+
 $connection = new AMQPStreamConnection('rabbitmq', 5672, 'guest', 'guest');
 $channel = $connection->channel();
 

@@ -1,0 +1,50 @@
+services:
+  app:
+    image: webdevops/php-nginx-dev:7.4-alpine
+    container_name: app
+    networks:
+      - rabbitmq
+    working_dir: /var/www/app
+    volumes:
+      - .:/var/www/app
+    environment:
+      - WEB_DOCUMENT_ROOT=/var/www/app/public
+      - PHP_DISPLAY_ERRORS=0
+      - PHP_MEMORY_LIMIT=4096M
+      - PHP_MAX_EXECUTION_TIME=300
+      - PHP_POST_MAX_SIZE=500M
+      - PHP_UPLOAD_MAX_FILESIZE=500M
+      - PHP_DEBUGGER="xdebug"
+      - XDEBUG_MODE=debug
+      - XDEBUG_DISCOVER_CLIENT_HOST=Off
+      - XDEBUG_CLIENT_HOST=172.17.0.1
+      - XDEBUG_CLIENT_PORT=9090
+      - XDEBUG_PROFILER_ENABLE=Off
+      - COMPOSER_VERSION=2
+      - PHP_DATE_TIMEZONE=America/Fortaleza
+    expose:
+      - "9090"
+    ports:
+      - "80:80"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    networks:
+      - rabbitmq
+    hostname: "rabbitlocal"
+    volumes:
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "guest"
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+networks:
+  rabbitmq:
+    name: rabbitmq
+    driver: bridge
